@@ -15,54 +15,55 @@ program.parse(process.argv);
 const argv = program.opts();
 
 async function invokeAction({ action, id, name, email, phone }) {
-  switch (action) {
-    case 'list':
-      const contactsList = await contacts.listContacts();
-      console.log('Contacts:');
-      console.table(contactsList);
-      break;
-
-    case 'get':
-      if (!id) {
-        console.error('ID is required for get action');
+  try {
+    switch (action) {
+      case 'list':
+        const contactsList = await contacts.listContacts();
+        console.log('Contacts:');
+        console.table(contactsList);
         break;
-      }
-      const contact = await contacts.getContactById(id);
-      if (contact) {
-        console.log('Contact:');
-        console.table([contact]);
-      } else {
-        console.log(`Contact with id ${id} not found`);
-      }
-      break;
 
-    case 'add':
-      if (!name || !email || !phone) {
-        console.error('Name, email, and phone are required for add action');
+      case 'get':
+        if (!id) {
+          console.error('ID is required for get action');
+          break;
+        }
+        const contact = await contacts.getContactById(id);
+        if (contact) {
+          console.log('Contact:');
+          console.table([contact]);
+        } else {
+          console.log(`Contact with id ${id} not found`);
+        }
         break;
-      }
-      const newContact = await contacts.addContact(name, email, phone);
-      console.log('New Contact added:');
-      console.table([newContact]);
-      break;
 
-    case 'remove':
-      if (!id) {
-        console.error('ID is required for remove action');
+      case 'add':
+        if (!name || !email || !phone) {
+          console.error('Name, email, and phone are required for add action');
+          break;
+        }
+        const newContact = await contacts.addContact(name, email, phone);
+        console.log('New Contact added:');
+        console.table([newContact]);
         break;
-      }
-      const updatedContacts = await contacts.removeContact(id);
-      if (updatedContacts) {
+
+      case 'remove':
+        if (!id) {
+          console.error('ID is required for remove action');
+          break;
+        }
+        const updatedContacts = await contacts.removeContact(id);
         console.log('Contact removed. Updated Contacts:');
         console.table(updatedContacts);
-      } else {
-        console.log(`Contact with id ${id} not found`);
-      }
-      break;
+        break;
 
-    default:
-      console.warn('\x1B[31m Unknown action type!');
+      default:
+        console.warn('\x1B[31m Unknown action type!');
+    }
+  } catch (error) {
+    console.error('An error occurred:', error.message);
   }
 }
 
 invokeAction(argv);
+
